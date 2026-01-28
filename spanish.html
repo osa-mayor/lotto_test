@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇪🇸 스페인어 명언</title>
+    <meta name="description" content="매일 새로운 스페인어 명언과 속담을 만나보세요!">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 테마 CSS 변수 정의 */
+        :root {
+            --bg-gradient-1: #1a1a2e;
+            --bg-gradient-2: #16213e;
+            --bg-gradient-3: #0f3460;
+            --text-primary: #fff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --quote-bg: rgba(255, 255, 255, 0.05);
+            --accent: #e94560;
+        }
+
+        /* 라이트 모드 */
+        body.light {
+            --bg-gradient-1: #ffecd2;
+            --bg-gradient-2: #fcb69f;
+            --bg-gradient-3: #ffecd2;
+            --text-primary: #2d3748;
+            --text-secondary: rgba(45, 55, 72, 0.85);
+            --text-muted: rgba(45, 55, 72, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(45, 55, 72, 0.1);
+            --quote-bg: rgba(255, 255, 255, 0.6);
+            --accent: #c53030;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+        }
+
+        /* 헤더 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #e94560, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* 메인 카드 */
+        .main-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            transition: background 0.3s ease, border 0.3s ease;
+        }
+
+        /* 명언 리스트 */
+        .quotes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+            min-height: 300px;
+        }
+
+        .quote-card {
+            background: var(--quote-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border-left: 4px solid var(--accent);
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+        }
+
+        .quote-card.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .quote-spanish {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .quote-korean {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .quote-author {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .quote-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 60px 20px;
+            font-size: 1.1rem;
+        }
+
+        .empty-state span {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* 버튼 */
+        .generate-btn {
+            width: 100%;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            background: linear-gradient(135deg, #e94560 0%, #f39c12 100%);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(233, 69, 96, 0.5);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 푸터 */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .luck-message {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        /* 테마 토글 버튼 */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* 홈 버튼 */
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 반응형 */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-card {
+                padding: 30px 20px;
+            }
+
+            .quote-spanish {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 홈 버튼 -->
+    <a href="index.html" class="home-btn" aria-label="홈으로">🏠</a>
+
+    <!-- 테마 토글 버튼 -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="테마 전환">
+        <span id="themeIcon">🌙</span>
+    </button>
+
+    <div class="container">
+        <header>
+            <div class="logo">🇪🇸</div>
+            <h1>스페인어 명언</h1>
+            <p class="subtitle">매일 새로운 명언과 속담을 만나보세요!</p>
+        </header>
+
+        <main class="main-card">
+            <div class="quotes-container" id="quotesContainer">
+                <div class="empty-state">
+                    <span>📜</span>
+                    버튼을 눌러 명언을 확인하세요
+                </div>
+            </div>
+            <button class="generate-btn" id="generateBtn" onclick="generateQuotes()">
+                ✨ 명언 5개 보기
+            </button>
+        </main>
+
+        <footer>
+            <p class="luck-message">🌟 오늘도 좋은 하루 되세요! 🌟</p>
+            <p>© 2026 스페인어 명언</p>
+        </footer>
+    </div>
+
+    <script>
+        const THEME_KEY = 'spanish_theme';
+
+        // 스페인어 명언 데이터
+        const quotes = [
+            { spanish: "El que no arriesga, no gana.", korean: "위험을 감수하지 않는 자는 얻지 못한다.", author: "속담" },
+            { spanish: "Más vale tarde que nunca.", korean: "늦더라도 안 하는 것보다 낫다.", author: "속담" },
+            { spanish: "No hay mal que por bien no venga.", korean: "모든 일에는 좋은 면이 있다. (전화위복)", author: "속담" },
+            { spanish: "Quien mucho abarca, poco aprieta.", korean: "많이 움켜쥐려는 자는 적게 잡는다.", author: "속담" },
+            { spanish: "A mal tiempo, buena cara.", korean: "어려운 시기에도 밝은 표정을.", author: "속담" },
+            { spanish: "El amor todo lo puede.", korean: "사랑은 모든 것을 할 수 있다.", author: "속담" },
+            { spanish: "La vida es sueño.", korean: "인생은 꿈이다.", author: "칼데론" },
+            { spanish: "Saber es poder.", korean: "아는 것이 힘이다.", author: "프란시스 베이컨" },
+            { spanish: "El tiempo es oro.", korean: "시간은 금이다.", author: "속담" },
+            { spanish: "Ojos que no ven, corazón que no siente.", korean: "보지 않으면 마음도 느끼지 못한다.", author: "속담" },
+            { spanish: "Haz bien y no mires a quién.", korean: "선을 행하고 누구인지 보지 마라.", author: "속담" },
+            { spanish: "La práctica hace al maestro.", korean: "연습이 달인을 만든다.", author: "속담" },
+            { spanish: "Donde hay voluntad, hay camino.", korean: "의지가 있는 곳에 길이 있다.", author: "속담" },
+            { spanish: "En boca cerrada no entran moscas.", korean: "다문 입에는 파리가 들어가지 않는다. (침묵은 금)", author: "속담" },
+            { spanish: "Cada maestrillo tiene su librillo.", korean: "각자 자기만의 방법이 있다.", author: "속담" },
+            { spanish: "No dejes para mañana lo que puedas hacer hoy.", korean: "오늘 할 수 있는 일을 내일로 미루지 마라.", author: "속담" },
+            { spanish: "El que ríe último, ríe mejor.", korean: "마지막에 웃는 자가 가장 잘 웃는다.", author: "속담" },
+            { spanish: "A quien madruga, Dios le ayuda.", korean: "일찍 일어나는 자를 신이 돕는다.", author: "속담" },
+            { spanish: "La esperanza es lo último que se pierde.", korean: "희망은 마지막까지 잃지 않는 것이다.", author: "속담" },
+            { spanish: "Vivir sin amar no es propiamente vivir.", korean: "사랑 없이 사는 것은 진정한 삶이 아니다.", author: "몰리에르" },
+            { spanish: "El conocimiento es libertad.", korean: "지식은 자유이다.", author: "속담" },
+            { spanish: "Camarón que se duerme, se lo lleva la corriente.", korean: "잠든 새우는 물결에 떠내려간다. (방심하면 안 된다)", author: "속담" },
+            { spanish: "De tal palo, tal astilla.", korean: "그 나무에 그 조각. (부전자전)", author: "속담" },
+            { spanish: "Más vale prevenir que curar.", korean: "치료보다 예방이 낫다.", author: "속담" },
+            { spanish: "El que busca, encuentra.", korean: "찾는 자가 찾는다.", author: "속담" },
+            { spanish: "La unión hace la fuerza.", korean: "뭉치면 힘이 된다.", author: "속담" },
+            { spanish: "Querer es poder.", korean: "원하는 것이 곧 힘이다.", author: "속담" },
+            { spanish: "Dime con quién andas, y te diré quién eres.", korean: "누구와 다니는지 말해봐, 네가 누군지 말해줄게.", author: "속담" },
+            { spanish: "El respeto al derecho ajeno es la paz.", korean: "타인의 권리를 존중하는 것이 평화다.", author: "베니토 후아레스" },
+            { spanish: "Después de la tormenta viene la calma.", korean: "폭풍 후에 고요함이 온다.", author: "속담" }
+        ];
+
+        // 테마 초기화
+        function initTheme() {
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
+                document.body.classList.add('light');
+                document.getElementById('themeIcon').textContent = '☀️';
+            } else {
+                document.body.classList.remove('light');
+                document.getElementById('themeIcon').textContent = '🌙';
+            }
+        }
+
+        // 테마 토글
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+
+            body.classList.toggle('light');
+
+            if (body.classList.contains('light')) {
+                icon.textContent = '☀️';
+                localStorage.setItem(THEME_KEY, 'light');
+            } else {
+                icon.textContent = '🌙';
+                localStorage.setItem(THEME_KEY, 'dark');
+            }
+        }
+
+        // 랜덤 명언 5개 선택
+        function getRandomQuotes() {
+            const shuffled = [...quotes].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, 5);
+        }
+
+        // 명언 생성 및 표시
+        function generateQuotes() {
+            const btn = document.getElementById('generateBtn');
+            const container = document.getElementById('quotesContainer');
+
+            btn.disabled = true;
+            btn.textContent = '📖 불러오는 중...';
+
+            const selectedQuotes = getRandomQuotes();
+            container.innerHTML = '';
+
+            selectedQuotes.forEach((quote, index) => {
+                const card = document.createElement('div');
+                card.className = 'quote-card';
+                card.innerHTML = `
+                    <div class="quote-spanish">
+                        <span class="quote-number">${index + 1}</span>
+                        ${quote.spanish}
+                    </div>
+                    <div class="quote-korean">${quote.korean}</div>
+                    <div class="quote-author">— ${quote.author}</div>
+                `;
+                container.appendChild(card);
+
+                setTimeout(() => {
+                    card.classList.add('show');
+                }, index * 150);
+            });
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = '✨ 명언 5개 보기';
+            }, selectedQuotes.length * 150 + 300);
+        }
+
+        // 시스템 테마 변경 감지
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (!localStorage.getItem(THEME_KEY)) {
+                initTheme();
+            }
+        });
+
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', initTheme);
+    </script>
+</body>
+
+</html>
