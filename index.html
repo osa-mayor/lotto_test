@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎱 로또 번호 추천기</title>
+    <meta name="description" content="행운의 로또 번호를 추천받아보세요! 1-45 중 6개의 번호를 랜덤으로 생성합니다.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* 헤더 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #f9d423, #ff4e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        /* 메인 카드 */
+        .main-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        /* 로또 공 영역 */
+        .balls-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+            min-height: 80px;
+        }
+
+        .ball {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                inset 0 -8px 20px rgba(0, 0, 0, 0.3),
+                inset 0 8px 20px rgba(255, 255, 255, 0.3),
+                0 8px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .ball.show {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .ball.bounce {
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            30% { transform: scale(1.2); }
+            50% { transform: scale(0.9); }
+            70% { transform: scale(1.1); }
+        }
+
+        /* 번호대별 색상 */
+        .ball.yellow { background: linear-gradient(145deg, #ffc107, #ff9800); }
+        .ball.blue { background: linear-gradient(145deg, #2196f3, #1565c0); }
+        .ball.red { background: linear-gradient(145deg, #f44336, #c62828); }
+        .ball.gray { background: linear-gradient(145deg, #9e9e9e, #616161); }
+        .ball.green { background: linear-gradient(145deg, #4caf50, #2e7d32); }
+
+        .ball.placeholder {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        .ball.placeholder span {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 2rem;
+        }
+
+        /* 버튼 */
+        .generate-btn {
+            width: 100%;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 히스토리 섹션 */
+        .history-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .clear-btn {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-family: 'Outfit', sans-serif;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255, 77, 77, 0.3);
+            border-color: rgba(255, 77, 77, 0.5);
+            color: #fff;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .history-number {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            min-width: 25px;
+        }
+
+        .history-balls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .mini-ball {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 
+                inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+                inset 0 3px 8px rgba(255, 255, 255, 0.2);
+        }
+
+        .mini-ball.yellow { background: linear-gradient(145deg, #ffc107, #ff9800); }
+        .mini-ball.blue { background: linear-gradient(145deg, #2196f3, #1565c0); }
+        .mini-ball.red { background: linear-gradient(145deg, #f44336, #c62828); }
+        .mini-ball.gray { background: linear-gradient(145deg, #9e9e9e, #616161); }
+        .mini-ball.green { background: linear-gradient(145deg, #4caf50, #2e7d32); }
+
+        .empty-history {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            padding: 30px;
+            font-size: 0.95rem;
+        }
+
+        /* 푸터 */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .luck-message {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 반응형 */
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .ball { width: 55px; height: 55px; font-size: 1.3rem; }
+            .balls-container { gap: 8px; }
+            .main-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🎱</div>
+            <h1>로또 번호 추천기</h1>
+            <p class="subtitle">행운의 번호를 뽑아보세요!</p>
+        </header>
+
+        <main class="main-card">
+            <div class="balls-container" id="ballsContainer">
+                <div class="ball placeholder"><span>?</span></div>
+                <div class="ball placeholder"><span>?</span></div>
+                <div class="ball placeholder"><span>?</span></div>
+                <div class="ball placeholder"><span>?</span></div>
+                <div class="ball placeholder"><span>?</span></div>
+                <div class="ball placeholder"><span>?</span></div>
+            </div>
+            <button class="generate-btn" id="generateBtn" onclick="generateNumbers()">
+                🎲 번호 뽑기
+            </button>
+        </main>
+
+        <section class="history-section">
+            <div class="history-header">
+                <h2 class="history-title">📋 최근 번호 기록</h2>
+                <button class="clear-btn" onclick="clearHistory()">기록 삭제</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-history">아직 생성된 번호가 없습니다</div>
+            </div>
+        </section>
+
+        <footer>
+            <p class="luck-message">✨ 행운이 함께하길 바랍니다! ✨</p>
+            <p>© 2026 로또 번호 추천기</p>
+        </footer>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'lotto_history';
+        const MAX_HISTORY = 5;
+
+        // 번호대별 색상 클래스 반환
+        function getBallColorClass(num) {
+            if (num <= 10) return 'yellow';
+            if (num <= 20) return 'blue';
+            if (num <= 30) return 'red';
+            if (num <= 40) return 'gray';
+            return 'green';
+        }
+
+        // 랜덤 로또 번호 생성 (1-45 중 6개)
+        function generateLottoNumbers() {
+            const numbers = [];
+            while (numbers.length < 6) {
+                const num = Math.floor(Math.random() * 45) + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            return numbers.sort((a, b) => a - b);
+        }
+
+        // 번호 생성 및 애니메이션
+        function generateNumbers() {
+            const btn = document.getElementById('generateBtn');
+            const container = document.getElementById('ballsContainer');
+            
+            btn.disabled = true;
+            btn.textContent = '🎰 추첨 중...';
+
+            const numbers = generateLottoNumbers();
+            
+            // 공 초기화
+            container.innerHTML = '';
+            
+            // 순차적으로 공 표시
+            numbers.forEach((num, index) => {
+                const ball = document.createElement('div');
+                ball.className = `ball ${getBallColorClass(num)}`;
+                ball.textContent = num;
+                container.appendChild(ball);
+
+                setTimeout(() => {
+                    ball.classList.add('show', 'bounce');
+                    setTimeout(() => ball.classList.remove('bounce'), 600);
+                }, index * 200);
+            });
+
+            // 모든 애니메이션 완료 후
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = '🎲 번호 뽑기';
+                saveToHistory(numbers);
+                renderHistory();
+            }, numbers.length * 200 + 300);
+        }
+
+        // 히스토리 저장
+        function saveToHistory(numbers) {
+            let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            history.unshift({
+                numbers: numbers,
+                timestamp: new Date().toISOString()
+            });
+            history = history.slice(0, MAX_HISTORY);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        }
+
+        // 히스토리 로드
+        function loadHistory() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        }
+
+        // 히스토리 렌더링
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            const history = loadHistory();
+
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-history">아직 생성된 번호가 없습니다</div>';
+                return;
+            }
+
+            container.innerHTML = history.map((item, idx) => `
+                <div class="history-item">
+                    <span class="history-number">#${idx + 1}</span>
+                    <div class="history-balls">
+                        ${item.numbers.map(num => `
+                            <div class="mini-ball ${getBallColorClass(num)}">${num}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 히스토리 삭제
+        function clearHistory() {
+            if (confirm('모든 기록을 삭제하시겠습니까?')) {
+                localStorage.removeItem(STORAGE_KEY);
+                renderHistory();
+            }
+        }
+
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', renderHistory);
+    </script>
+</body>
+</html>
