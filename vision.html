@@ -7,8 +7,8 @@
     <title>✌️🤜✋ AI 가위바위보</title>
     <meta name="description" content="AI와 함께하는 실시간 가위바위보 게임! 손을 보여주세요.">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- ml5.js 라이브러리 (최신 버전 사용) -->
-    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <!-- ml5.js 라이브러리 (0.12.2 버전 고정) -->
+    <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
     <style>
         /* 테마 CSS 변수 정의 */
         :root {
@@ -417,32 +417,58 @@
                 videoElement.srcObject = stream;
                 videoElement.play();
 
-                // 비디오 크기 맞춰 캔버스 조정
+                // 비디오 크기 맞춰 캔버스 조정 및 모델 로드
                 videoElement.onloadedmetadata = () => {
                     canvas.width = videoElement.clientWidth;
                     canvas.height = videoElement.clientHeight;
 
-                    // Handpose 모델 로드
-                    handpose = ml5.handpose(videoElement, () => {
-                        console.log('Model Ready');
-                        modelLoaded = true;
-                        statusMsg.textContent = '준비 완료! 게임을 시작하세요 👋';
-                        document.getElementById('playBtn').disabled = false;
+                    statusMsg.textContent = '🧠 AI 모델(HandPose) 불러오는 중...';
 
-                        // 예측 시작
-                        handpose.on('predict', results => {
-                            predictions = results;
-                            currentGesture = determineGesture(predictions);
+                    // Handpose 모델 로드 (타임아웃 처리)
+                    const modelLoadPromise = new Promise((resolve, reject) => {
+                        const timeout = setTimeout(() => reject(new Error('모델 로딩 시간 초과')), 20000); // 20초 타임아웃
 
-                            // 캔버스 그리기 및 제스처 업데이트
-                            drawKeypoints(ctx, predictions);
-                            updateGenerureDisplay();
-                        });
+                        try {
+                            handpose = ml5.handpose(videoElement, () => {
+                                clearTimeout(timeout);
+                                resolve();
+                            });
+                        } catch (e) {
+                            clearTimeout(timeout);
+                            reject(e);
+                        }
                     });
+
+                    modelLoadPromise
+                        .then(() => {
+                            console.log('Model Ready');
+                            modelLoaded = true;
+                            statusMsg.textContent = '준비 완료! 게임을 시작하세요 👋';
+                            document.getElementById('playBtn').disabled = false;
+
+                            // 예측 시작
+                            handpose.on('predict', results => {
+                                predictions = results;
+                                currentGesture = determineGesture(predictions);
+
+                                // 캔버스 그리기 및 제스처 업데이트
+                                drawKeypoints(ctx, predictions);
+                                updateGenerureDisplay();
+                            });
+                        })
+                        .catch(err => {
+                            console.error('모델 로딩 실패:', err);
+                            statusMsg.innerHTML = '❌ AI 모델 로딩 실패!<br><span style="font-size:0.8em">새로고침을 하거나 브라우저를 확인해주세요.</span>';
+                            alert('AI 모델을 불러오는데 실패했습니다: ' + err.message);
+                        });
                 };
             } catch (err) {
                 console.error(err);
-                statusMsg.textContent = '❌ 카메라 접근 권한이 필요합니다.';
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    statusMsg.textContent = '❌ 카메라 접근 권한이 거부되었습니다.';
+                } else {
+                    statusMsg.textContent = '❌ 오류 발생: ' + err.message;
+                }
             }
         }
 
